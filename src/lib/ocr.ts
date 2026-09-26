@@ -1,5 +1,6 @@
 import Tesseract from "tesseract.js";
 import type { DocType } from "./id-validators";
+import { checkAlignmentConsistency } from "./alignment";
 
 export async function extractFields(imageFile: File): Promise<{
   documentType: DocType;
@@ -11,6 +12,7 @@ export async function extractFields(imageFile: File): Promise<{
   };
   ocrConfidenceScore: number;
   classificationConfidence: "high" | "low"; // high = keyword-backed, low = pattern-only guess
+  layoutConsistency: { alignmentScore: number; anomalies: { type: string; description: string }[] };
 }> {
   const result = await Tesseract.recognize(imageFile, "eng", {
     logger: (m) => console.log("[OCR]", m.status, Math.round(m.progress * 100) + "%"),
@@ -117,5 +119,6 @@ export async function extractFields(imageFile: File): Promise<{
     extractedFields: { name, dob, idNumber, expiryDate: null },
     ocrConfidenceScore,
     classificationConfidence,
+    layoutConsistency: checkAlignmentConsistency(lines),
   };
 }

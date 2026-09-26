@@ -20,10 +20,11 @@ export async function generateForensicReport(opts: {
   operator: string;
   images: { original: string; heatmap: string | null };
   classification: string;
-  extracted: { name: string | null; dob: string | null; idNumber: string | null };
-  checksumResult: { valid: boolean | null; reason: string };
-  scores: { riskScore: number; elaVariance: number | null; ocrConfidence: number; checksumScore: number };
+  extracted: { name: string | null; dob: string | null; idNumber: string | null; expiryDate: string | null };
+  checksumResult: { valid: boolean | null; reason: string | null };
+  scores: { riskScore: number; elaVariance: number | null; ocrConfidence: number; alignmentScore: number };
   flags: string[];
+  boxes: { x: number; y: number; width: number; height: number }[];
 }) {
   const doc = new jsPDF();
   let currentY = 20;
@@ -99,7 +100,8 @@ export async function generateForensicReport(opts: {
       ["ID Number", opts.extracted.idNumber || "N/A"],
       ["Name", opts.extracted.name || "N/A"],
       ["DOB", opts.extracted.dob || "N/A"],
-      ["Algorithm Check", opts.checksumResult.reason],
+      ["Expiry Date", opts.extracted.expiryDate || "N/A"],
+      ["Algorithm Check", opts.checksumResult.reason || "N/A"],
     ],
     theme: "striped",
     headStyles: { fillColor: [0, 112, 243], textColor: 255 },
@@ -114,10 +116,13 @@ export async function generateForensicReport(opts: {
     startY: currentY,
     head: [["Risk Analysis & Sub-Scores", "Value"]],
     body: [
-      ["Final Composite Risk Score", `${opts.scores.riskScore}/100`],
-      ["ELA Variance (V_ELA)", opts.scores.elaVariance === null ? "N/A" : opts.scores.elaVariance],
-      ["OCR Confidence (C_OCR)", opts.scores.ocrConfidence],
-      ["Format Penalty (S_Format)", opts.scores.checksumScore],
+      ["Final Composite Risk Score", `${opts.scores.riskScore}/100 (30% ELA, 25% OCR, 25% Checksum, 20% Layout)`],
+      ["ELA Variance (V_ELA)", opts.scores.elaVariance === null ? "N/A — not a JPEG" : opts.scores.elaVariance.toFixed(1)],
+      ["OCR Confidence (C_OCR)", Math.round(opts.scores.ocrConfidence).toString()],
+      ["Checksum / Format Result", opts.checksumResult.valid === true ? "Valid" : opts.checksumResult.valid === false ? "Invalid" : "Not applicable"],
+      ["Checksum / Format Reason", opts.checksumResult.reason || "N/A"],
+      ["Layout Consistency Score", opts.scores.alignmentScore.toString()],
+      ["Suspicious Regions (Boxes)", opts.boxes.length > 0 ? opts.boxes.map(b => `[X:${b.x}, Y:${b.y}, W:${b.width}, H:${b.height}]`).join(", ") : "None"],
       ...opts.flags.map((f, i) => [`Flag ${i + 1}`, f])
     ],
     theme: "striped",
