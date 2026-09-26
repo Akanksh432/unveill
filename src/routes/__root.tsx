@@ -9,7 +9,7 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import appCss from "../styles.css?url";
 import { AppProvider, useApp } from "@/lib/app-context";
@@ -98,11 +98,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body className="dark bg-background text-foreground antialiased">
+      <body className="bg-background text-foreground antialiased">
         {children}
         <Scripts />
       </body>
@@ -126,6 +126,42 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// "The Unveiling" Transition
+function PageTransition() {
+  const routerState = useRouterState();
+  const [transitioning, setTransitioning] = useState(false);
+  const [prevPath, setPrevPath] = useState(routerState.location.pathname);
+
+  useEffect(() => {
+    if (routerState.location.pathname !== prevPath) {
+      setTransitioning(true);
+      setPrevPath(routerState.location.pathname);
+      const t = setTimeout(() => setTransitioning(false), 800);
+      return () => clearTimeout(t);
+    }
+  }, [routerState.location.pathname, prevPath]);
+
+  if (!transitioning) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] pointer-events-none overflow-hidden flex items-center justify-center">
+      <div 
+        className="absolute inset-y-0 w-[200vw] bg-[var(--sage)]/40 backdrop-blur-sm transform transition-transform duration-700 ease-in-out"
+        style={{
+          animation: "sweep 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+        }}
+      />
+      <style>{`
+        @keyframes sweep {
+          0% { transform: translateX(-100%) skewX(-10deg); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateX(100%) skewX(-10deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -133,6 +169,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AppProvider>
         <AuthGate>
+          <PageTransition />
           <Outlet />
           <AlertDetailDrawer />
           <DocDetailDrawer />
