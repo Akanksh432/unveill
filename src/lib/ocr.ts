@@ -10,72 +10,98 @@ export async function extractFields(imageFile: File): Promise<{
     expiryDate: string | null;
   };
   ocrConfidenceScore: number;
+  classificationConfidence: "high" | "low"; // high = keyword-backed, low = pattern-only guess
 }> {
-  // 1. Tesseract OCR
   const result = await Tesseract.recognize(imageFile, "eng", {
     logger: (m) => console.log("[OCR]", m.status, Math.round(m.progress * 100) + "%"),
   });
-  
+
   const data = result.data as any;
   const text: string = data.text;
   const words: any[] = data.words || [];
   const lines: any[] = data.lines || [];
-  
-  // 4. Calculate OCR Confidence
-  const ocrConfidenceScore = words.length > 0
-    ? words.reduce((acc: number, w: any) => acc + w.confidence, 0) / words.length
-    : 0;
+
+  const ocrConfidenceScore =
+    words.length > 0
+      ? words.reduce((acc: number, w: any) => acc + w.confidence, 0) / words.length
+      : 0;
+
+  const dobMatch = text.match(/(\d{2}[-/.]\d{2}[-/.]\d{4})/);
+  const dob = dobMatch ? dobMatch[1] : null;
+
+  // --- Priority-ordered classification -------------------------------
+  // Rule: a STRONG signal (a type-specific keyword, e.g. "UIDAI", "Passport",
+  // "Election Commission", "Income Tax Department") always wins over a WEAK
+  // signal (a generic number-shape regex, which can coincidentally match
+  // digits from an unrelated field). Generic patterns are only used as a
+  // last-resort fallback, and the Aadhaar 12-digit fallback — the loosest
+  // pattern of the four — is tried LAST, not first.
+
+  const panNumberRegex = /\b([A-Z]{5}[0-9]{4}[A-Z])\b/i;
+  const passportNumberRegex = /\b([A-PR-WYa-pr-wy][1-9]\d{6})\b/;
+  const voterNumberRegex = /\b([A-Z]{3}[0-9]{7})\b/i;
+  const aadhaarNumberRegex = /\b\d{4}\s?\d{4}\s?\d{4}\b/;
+
+  const hasAadhaarKeyword = /(aadhaar|uidai|unique identification)/i.test(text);
+  const hasPanKeyword = /(income tax department|permanent account number|govt\.? of india)/i.test(text) && panNumberRegex.test(text);
+  const hasPassportKeyword = /passport/i.test(text) || /P<[A-Z0-9<]{5,}/.test(text);
+  const hasVoterKeyword = /(election commission|epic no|elector'?s? photo)/i.test(text);
 
   let documentType: DocType = "Unknown";
-  let name: string | null = null;
-  let dob: string | null = null;
   let idNumber: string | null = null;
-  let expiryDate: string | null = null;
+  let classificationConfidence: "high" | "low" = "low";
 
-  // DOB Extractor
-  const dobMatch = text.match(/(\d{2}[-/\.]\d{2}[-/\.]\d{4})/);
-  if (dobMatch) dob = dobMatch[1];
-
-  // 2 & 3. Document-type heuristics and field extraction
-  
-  // Aadhaar
-  if (/(aadhaar|uidai)/i.test(text) || /\b\d{4}\s?\d{4}\s?\d{4}\b/.test(text)) {
-    documentType = "Aadhaar";
-    const numMatch = text.match(/\b\d{4}\s?\d{4}\s?\d{4}\b/);
-    if (numMatch) {
-      idNumber = numMatch[0].replace(/\s+/g, "");
-    }
-  } 
-  // PAN
-  else if (/\b[A-Z]{5}[0-9]{4}[A-Z]\b/i.test(text) || /(income tax department|govt\.? of india)/i.test(text)) {
-    const numMatch = text.match(/\b([A-Z]{5}[0-9]{4}[A-Z])\b/i);
-    if (numMatch) {
-      documentType = "PAN";
-      idNumber = numMatch[1].toUpperCase();
-    }
-  } 
-  // Passport
-  else if (/passport/i.test(text) || /P<[A-Z0-9<]+/.test(text)) {
+  // Pass 1 — strong, keyword-backed matches (checked in specificity order)
+  if (hasPassportKeyword) {
     documentType = "Passport";
-    const numMatch = text.match(/\b([A-PR-WYa-pr-wy][1-9]\d{6})\b/);
-    if (numMatch) idNumber = numMatch[1].toUpperCase();
-  } 
-  // Voter ID (EPIC)
-  else if (/(election commission|epic|elector photo)/i.test(text) || /\b[A-Z]{3}[0-9]{7}\b/i.test(text)) {
+    const m = text.match(passportNumberRegex);
+    idNumber = m ? m[1].toUpperCase() : null;
+    classificationConfidence = "high";
+  } else if (hasPanKeyword) {
+    documentType = "PAN";
+    const m = text.match(panNumberRegex);
+    idNumber = m ? m[1].toUpperCase() : null;
+    classificationConfidence = "high";
+  } else if (hasVoterKeyword) {
     documentType = "Voter ID";
-    const numMatch = text.match(/\b([A-Z]{3}[0-9]{7})\b/i);
-    if (numMatch) idNumber = numMatch[1].toUpperCase();
+    const m = text.match(voterNumberRegex);
+    idNumber = m ? m[1].toUpperCase() : null;
+    classificationConfidence = "high";
+  } else if (hasAadhaarKeyword) {
+    documentType = "Aadhaar";
+    const m = text.match(aadhaarNumberRegex);
+    idNumber = m ? m[0].replace(/\s+/g, "") : null;
+    classificationConfidence = "high";
+  }
+  // Pass 2 — no keyword found anywhere; fall back to format-only pattern
+  // matches, still in specificity order (most-constrained regex first, the
+  // loose generic 12-digit Aadhaar shape absolute last).
+  else if (panNumberRegex.test(text)) {
+    documentType = "PAN";
+    idNumber = text.match(panNumberRegex)![1].toUpperCase();
+    classificationConfidence = "low";
+  } else if (voterNumberRegex.test(text)) {
+    documentType = "Voter ID";
+    idNumber = text.match(voterNumberRegex)![1].toUpperCase();
+    classificationConfidence = "low";
+  } else if (passportNumberRegex.test(text)) {
+    documentType = "Passport";
+    idNumber = text.match(passportNumberRegex)![1].toUpperCase();
+    classificationConfidence = "low";
+  } else if (aadhaarNumberRegex.test(text)) {
+    documentType = "Aadhaar";
+    idNumber = text.match(aadhaarNumberRegex)![0].replace(/\s+/g, "");
+    classificationConfidence = "low";
   }
 
-  // Name extraction (very basic heuristic)
+  // --- Name extraction (unchanged heuristic) --------------------------
+  let name: string | null = null;
   if (lines.length > 0) {
     const textLines = lines.map((l: any) => (l.text || "").trim()).filter((l: string) => l.length > 0);
-    // Find line after "Name" or similar
-    const nameLabelIdx = textLines.findIndex((l: string) => /^(name|father's name|father name)/i.test(l));
+    const nameLabelIdx = textLines.findIndex((l: string) => /^(name|father'?s name)/i.test(l));
     if (nameLabelIdx >= 0 && nameLabelIdx + 1 < textLines.length) {
       name = textLines[nameLabelIdx + 1].replace(/^[^:]+:\s*/, "");
     } else {
-      // Fallback: longest uppercase sequence (rough heuristic for Indian IDs)
       let longestUpper = "";
       for (const line of textLines) {
         if (/^[A-Z\s]+$/.test(line) && line.length > longestUpper.length && line.length > 3) {
@@ -88,7 +114,8 @@ export async function extractFields(imageFile: File): Promise<{
 
   return {
     documentType,
-    extractedFields: { name, dob, idNumber, expiryDate },
+    extractedFields: { name, dob, idNumber, expiryDate: null },
     ocrConfidenceScore,
+    classificationConfidence,
   };
 }

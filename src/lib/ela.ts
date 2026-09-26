@@ -45,7 +45,8 @@ export async function runELA(imageFile: File): Promise<{
         const heatmapData = new ImageData(width, height);
         
         const AMPLIFY = 10;
-        let totalDiff = 0;
+        const HOTSPOT_FLOOR = 60;
+        let hotspotCount = 0;
         let pixelCount = 0;
 
         for (let i = 0; i < originalData.data.length; i += 4) {
@@ -56,7 +57,9 @@ export async function runELA(imageFile: File): Promise<{
           const maxDiff = Math.max(rDiff, gDiff, bDiff);
           const amplified = Math.min(255, maxDiff * AMPLIFY);
           
-          totalDiff += amplified;
+          if (amplified > HOTSPOT_FLOOR) {
+            hotspotCount++;
+          }
           pixelCount++;
 
           // Heatmap: dark blue/black to red/yellow
@@ -70,8 +73,8 @@ export async function runELA(imageFile: File): Promise<{
 
         heatmapCtx.putImageData(heatmapData, 0, 0);
         
-        const avgAmplifiedDiff = totalDiff / pixelCount;
-        const varianceScore = Math.min(100, Math.round((avgAmplifiedDiff / 255) * 100));
+        const fraction = hotspotCount / pixelCount;
+        const varianceScore = Math.min(100, Math.round(fraction * 100 * 6));
 
         resolve({
           heatmapDataUrl: heatmapCtx.canvas.toDataURL("image/jpeg", 0.8),

@@ -27,6 +27,8 @@ interface AnalysisResult {
   score: number;
   originalImage: string;
   signals: Signal[];
+  documentType: string;
+  classificationConfidence: "high" | "low" | null;
 }
 
 function CircularScore({ score }: { score: number }) {
@@ -136,11 +138,11 @@ function ReviewPage() {
         });
       }
 
-      if (ocr.ocrConfidenceScore < 80) {
+      if (ocr.ocrConfidenceScore < 45) {
         signals.push({
           id: "sig-3", type: "suspicious", x: 20, y: 40,
-          title: "Text Misalignment / Obfuscation",
-          explanation: "The text extraction engine struggled to confidently read this area. The font might be digitally altered or smudged."
+          title: "Low OCR Confidence",
+          explanation: "OCR confidence was low on this image — could be lighting/angle, not necessarily tampering."
         });
       }
 
@@ -157,7 +159,9 @@ function ReviewPage() {
       setResult({
         score,
         originalImage: URL.createObjectURL(file),
-        signals
+        signals,
+        documentType: ocr.documentType,
+        classificationConfidence: ocr.classificationConfidence
       });
       setStage("results");
     } catch (e) {
@@ -286,7 +290,10 @@ function ReviewPage() {
                     <div className="flex items-center justify-between mb-8 pb-6 border-b border-[var(--charcoal)]/10">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--charcoal)]/50 mb-1">Risk Assessment</span>
-                        <h2 className="text-2xl font-light text-[var(--charcoal)]">Evidence Map</h2>
+                        <h2 className="text-2xl font-light text-[var(--charcoal)] mb-2">Evidence Map</h2>
+                        {result.classificationConfidence === "low" && (
+                          <span className="text-[10px] uppercase tracking-wider text-[var(--terracotta)] font-medium">Low-confidence classification ({result.documentType})</span>
+                        )}
                       </div>
                       <CircularScore score={result.score} />
                     </div>
