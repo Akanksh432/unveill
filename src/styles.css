@@ -1,0 +1,284 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+}
+
+/* UNVEIL — Premium Obsidian & Champagne Gold */
+:root {
+  --radius: 1rem;
+  --gold: #D4AF37;
+  --gold-muted: #E5C158;
+  --gold-dim: rgba(212, 175, 55, 0.12);
+  --glass-bg: rgba(25, 25, 28, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --background: #09090B;
+  --foreground: #FAFAF9;
+  --card: #121214;
+  --card-foreground: #FAFAF9;
+  --popover: rgba(28, 25, 23, 0.92);
+  --popover-foreground: #FAFAF9;
+  --primary: #D4AF37;
+  --primary-foreground: #09090B;
+  --secondary: #1C1917;
+  --secondary-foreground: #E7E5E4;
+  --muted: #292524;
+  --muted-foreground: #A8A29E;
+  --accent: rgba(212, 175, 55, 0.08);
+  --accent-foreground: #E5C158;
+  --destructive: #7F1D1D;
+  --destructive-foreground: #FECACA;
+  --success: #365314;
+  --success-foreground: #D9F99D;
+  --warning: #78350F;
+  --warning-foreground: #FDE68A;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.06);
+  --ring: rgba(212, 175, 55, 0.45);
+  --chart-1: #D4AF37;
+  --chart-2: #A8A29E;
+  --chart-3: #78350F;
+  --chart-4: #7F1D1D;
+  --chart-5: #57534E;
+  --sidebar: rgba(18, 18, 20, 0.75);
+  --sidebar-foreground: #D6D3D1;
+  --sidebar-primary: #D4AF37;
+  --sidebar-primary-foreground: #09090B;
+  --sidebar-accent: rgba(212, 175, 55, 0.06);
+  --sidebar-accent-foreground: #FAFAF9;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: rgba(212, 175, 55, 0.35);
+}
+
+.light {
+  --background: #FAFAF9;
+  --foreground: #1C1917;
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+  --popover: rgba(255, 255, 255, 0.95);
+  --popover-foreground: #1C1917;
+  --primary: #B8960C;
+  --primary-foreground: #FFFBEB;
+  --secondary: #F5F5F4;
+  --secondary-foreground: #44403C;
+  --muted: #E7E5E4;
+  --muted-foreground: #78716C;
+  --accent: rgba(184, 150, 12, 0.08);
+  --accent-foreground: #92400E;
+  --destructive: #991B1B;
+  --destructive-foreground: #FEE2E2;
+  --success: #166534;
+  --success-foreground: #DCFCE7;
+  --warning: #92400E;
+  --warning-foreground: #FEF3C7;
+  --border: rgba(28, 25, 23, 0.1);
+  --input: rgba(28, 25, 23, 0.06);
+  --ring: rgba(184, 150, 12, 0.35);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(28, 25, 23, 0.08);
+  --sidebar: rgba(250, 250, 249, 0.88);
+  --sidebar-foreground: #57534E;
+  --sidebar-primary: #B8960C;
+  --sidebar-primary-foreground: #FFFBEB;
+  --sidebar-accent: rgba(184, 150, 12, 0.06);
+  --sidebar-accent-foreground: #1C1917;
+  --sidebar-border: rgba(28, 25, 23, 0.08);
+  --sidebar-ring: rgba(184, 150, 12, 0.3);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    letter-spacing: -0.011em;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(212, 175, 55, 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(41, 37, 36, 0.4), transparent);
+    background-attachment: fixed;
+    transition: opacity 0.4s var(--ease-premium), background-color 0.4s var(--ease-premium), color 0.4s var(--ease-premium);
+  }
+
+  body.theme-crossfade {
+    opacity: 0.88;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.4s var(--ease-premium);
+  }
+
+  .glass-card {
+    background: rgba(25, 25, 28, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    transition: all 0.4s var(--ease-premium);
+  }
+
+  .light .glass-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(28, 25, 23, 0.08);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(212, 175, 55, 0.15);
+  }
+
+  .glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    transition: all 0.4s var(--ease-premium);
+  }
+
+  .hover-glow {
+    transition: all 0.4s var(--ease-premium);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 24px rgba(212, 175, 55, 0.12);
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.6s var(--ease-premium) forwards;
+  }
+
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .border-gold-faint {
+    border-color: rgba(212, 175, 55, 0.2);
+  }
+
+  .premium-table-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .light .premium-table-row:nth-child(even) {
+    background: rgba(28, 25, 23, 0.02);
+  }
+
+  .nav-active-glow {
+    box-shadow: inset 3px 0 0 0 var(--gold), 0 0 20px rgba(212, 175, 55, 0.08);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes laser-sweep {
+  0%, 100% { top: 8%; opacity: 0.6; }
+  50% { top: 88%; opacity: 1; }
+}
+
+@keyframes matrix-fall {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes matrix-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes doc-outline-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), inset 0 0 30px rgba(212, 175, 55, 0.03); }
+  50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.25), inset 0 0 50px rgba(212, 175, 55, 0.06); }
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.neural-laser {
+  animation: laser-sweep 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.neural-doc-outline {
+  animation: doc-outline-glow 3s ease-in-out infinite;
+}
+
+.neural-terminal-cursor {
+  animation: terminal-blink 1s step-end infinite;
+}

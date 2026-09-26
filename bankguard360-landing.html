@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BankGuard360 | Advanced Banking Security & Fraud Detection</title>
+  <meta name="description" content="Secure bank documents before fraud spreads. BankGuard360 provides cross-document mismatch detection and suspicious activity monitoring for enterprise compliance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Color Palette & Tokens */
+    :root {
+      --bg-main: #03040B; /* Deep navy / black */
+      --bg-surface: rgba(18, 22, 30, 0.6);
+      --bg-surface-hover: rgba(26, 32, 44, 0.8);
+      
+      --text-primary: #F8F9FA;
+      --text-secondary: #A0AAB2;
+      
+      --accent-primary: #0070F3;
+      --accent-glow: rgba(0, 112, 243, 0.4);
+      --accent-cyan: #00F0FF;
+      
+      --border-light: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 240, 255, 0.25);
+      
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-pill: 9999px;
+      
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --glass-blur: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Base Elements */
+    a { text-decoration: none; color: inherit; }
+    h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.02em; }
+    p { margin: 0; color: var(--text-secondary); }
+
+    /* Animations */
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(0, 240, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+    }
+
+    @keyframes ambientDrift {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Typography */
+    .hero-title {
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+      background: linear-gradient(180deg, #FFFFFF 0%, #A0AAB2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: clamp(1.125rem, 2vw, 1.25rem);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 4rem;
+    }
+    .section-header h2 {
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      margin-bottom: 1rem;
+    }
+    .section-header p {
+      font-size: 1.125rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+    .btn-lg { padding: 1rem 2rem; font-size: 1.125rem; }
+
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--bg-main);
+    }
+    .btn-primary:hover {
+      background: #FFFFFF;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover {
+      color: var(--text-primary);
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1.25rem 2rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-bottom: 1px solid transparent;
+    }
+    .navbar.scrolled {
+      background: rgba(3, 4, 11, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 2rem;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .logo span {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+    .nav-cta {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10rem 2rem 6rem;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, rgba(0, 112, 243, 0.08) 0%, transparent 70%);
+    }
+    .gradient-sphere {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.5;
+      animation: ambientDrift 25s infinite alternate ease-in-out;
+    }
+    .sphere-1 {
+      top: 10%; left: 20%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent-primary), transparent 60%);
+    }
+    .sphere-2 {
+      bottom: 20%; right: 10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent-cyan), transparent 60%);
+      animation-delay: -10s;
+    }
+
+    .trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: var(--radius-pill);
+      font-size: 0.875rem;
+      color: var(--accent-cyan);
+      margin-bottom: 2.5rem;
+      font-weight: 500;
+    }
+    .pulse-dot {
+      width: 6px; height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      animation: pulseDot 2s infinite;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 6rem;
+    }
+
+    /* Parallax Mockup */
+    .hero-mockup {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
+    .mockup-window {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden;
+      transform: rotateX(8deg) translateY(20px);
+      transform-origin: top;
+      transition: transform 0.5s ease-out;
+    }
+    .mockup-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.3);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #FF5F56; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #27C93F; }
+
+    .mockup-body {
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      height: 340px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+    }
+    .mockup-skeleton-title {
+      height: 28px; width: 25%; background: rgba(255,255,255,0.1); border-radius: 6px; margin-bottom: 1.5rem;
+    }
+    .mockup-skeleton-row {
+      height: 70px; width: 100%; background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);
+    }
+
+    /* Stats Section */
+    .stats {
+      padding: 6rem 2rem;
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      background: rgba(255,255,255,0.01);
+      position: relative;
+    }
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      display: inline-block;
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-suffix {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+    }
+    .stat-label {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    /* Features Grid */
+    .features {
+      padding: 10rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 2.5rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+      background: var(--bg-surface-hover);
+    }
+    .icon-box {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+      color: var(--accent-cyan);
+      position: relative;
+      z-index: 2;
+    }
+    .icon-box svg { width: 24px; height: 24px; }
+    .feature-card h3 { font-size: 1.25rem; margin-bottom: 0.75rem; position: relative; z-index: 2; }
+    .feature-card p { font-size: 0.95rem; line-height: 1.6; position: relative; z-index: 2; }
+
+    /* Split Section */
+    .split-section {
+      padding: 8rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .eyebrow {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-cyan);
+      margin-bottom: 1rem;
+    }
+    .split-content h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.15;
+    }
+    .split-content p {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      color: var(--text-secondary);
+    }
+    .check-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .check-list li {
+      position: relative;
+      padding-left: 2rem;
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .check-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 2px;
+      width: 20px; height: 20px;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="%2300F0FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') no-repeat center;
+    }
+    
+    .split-visual {
+      position: relative;
+      height: 440px;
+      perspective: 1000px;
+    }
+    .card-stack {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+    .stacked-card {
+      position: absolute;
+      width: 85%;
+      right: 0; top: 10%;
+      background: rgba(15, 18, 25, 0.85);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 1.5rem;
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6);
+      transition: var(--transition);
+    }
+    .card-1 { z-index: 3; transform: translate(0, 0); }
+    .card-2 { z-index: 2; transform: translate(-24px, -24px) scale(0.95); opacity: 0.6; }
+    .card-3 { z-index: 1; transform: translate(-48px, -48px) scale(0.9); opacity: 0.3; }
+
+    .split-visual:hover .card-1 { transform: translate(10px, 10px); border-color: rgba(0, 240, 255, 0.3); }
+    .split-visual:hover .card-2 { transform: translate(-34px, -34px) scale(0.95); }
+
+    .card-header { font-weight: 600; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between;}
+    .card-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.875rem; padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 6px;}
+    .card-row .label { color: var(--text-secondary); }
+    .card-row .value { font-weight: 600; }
+    .value.success { color: #27C93F; }
+    .value.warning { color: #FFBD2E; }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 8rem 2rem;
+      background: radial-gradient(ellipse at center top, rgba(255,255,255,0.03) 0%, transparent 70%);
+    }
+    .testimonial-grid {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;
+    }
+    .testimonial-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 2.5rem;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+    .quote { font-size: 1.125rem; font-style: italic; margin-bottom: 2rem; color: var(--text-primary); line-height: 1.6; }
+    .author { display: flex; align-items: center; gap: 1rem; }
+    .author-info h4 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .author-info span { font-size: 0.875rem; color: var(--text-secondary); }
+
+    /* Final CTA */
+    .cta-section {
+      position: relative;
+      padding: 10rem 2rem;
+      text-align: center;
+      overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(0, 112, 243, 0.1), transparent 60%);
+      z-index: -1;
+      filter: blur(80px);
+    }
+    .cta-content {
+      max-width: 700px; margin: 0 auto;
+      background: rgba(15, 18, 25, 0.4);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: var(--radius-lg);
+      padding: 5rem 2rem;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    .cta-content h2 { font-size: 2.75rem; margin-bottom: 1rem; }
+    .cta-content p { font-size: 1.125rem; margin-bottom: 2.5rem; color: var(--text-secondary); }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 5rem 2rem 2rem;
+      background: #010205;
+    }
+    .footer-content {
+      max-width: 1200px; margin: 0 auto 4rem;
+      display: grid; grid-template-columns: 1fr 2fr; gap: 4rem;
+    }
+    .footer-brand .logo { margin-bottom: 1rem; }
+    .footer-brand p { max-width: 280px; font-size: 0.95rem; }
+    .footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .link-group h4 { font-size: 0.875rem; margin-bottom: 1.5rem; color: var(--text-primary); }
+    .link-group a { display: block; margin-bottom: 0.875rem; font-size: 0.875rem; color: var(--text-secondary); transition: color 0.2s; }
+    .link-group a:hover { color: var(--text-primary); }
+    .footer-bottom {
+      max-width: 1200px; margin: 0 auto;
+      padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.875rem; color: var(--text-secondary);
+    }
+
+    /* Media Queries */
+    @media (max-width: 900px) {
+      .split-section { grid-template-columns: 1fr; gap: 4rem; text-align: center; }
+      .check-list { text-align: left; display: inline-block; }
+      .card-stack { width: 90%; margin: 0 auto; }
+      .footer-content { grid-template-columns: 1fr; gap: 3rem; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hero { padding: 8rem 1rem 4rem; }
+      .stats-container { grid-template-columns: 1fr 1fr; gap: 2rem 1rem; }
+      .footer-links { grid-template-columns: 1fr 1fr; }
+      .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+      .stat-value { font-size: 3rem; }
+      .cta-content { padding: 3rem 1.5rem; }
+      .cta-content h2 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <div class="logo">BankGuard<span>360</span></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#results">Results</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="nav-cta">
+        <a href="#demo" class="btn btn-sm btn-ghost">Sign In</a>
+        <a href="#demo" class="btn btn-sm btn-primary">Book Demo</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="gradient-sphere sphere-1"></div>
+      <div class="gradient-sphere sphere-2"></div>
+    </div>
+    <div class="hero-content reveal">
+      <div class="trust-badge">
+        <span class="pulse-dot"></span> SOC2 Type II Certified
+      </div>
+      <h1 class="hero-title">Secure bank documents<br>before fraud spreads.</h1>
+      <p class="hero-subtitle">Intelligent cross-document mismatch detection and suspicious activity monitoring. Built for enterprise underwriters and compliance teams.</p>
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-lg btn-primary">Start Demo</a>
+        <a href="#features" class="btn btn-lg btn-secondary">Explore Platform</a>
+      </div>
+    </div>
+    
+    <!-- Parallax Mockup -->
+    <div class="hero-mockup reveal" style="transition-delay: 0.2s;">
+      <div class="mockup-window" id="mockup">
+        <div class="mockup-header">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        </div>
+        <div class="mockup-body">
+           <div class="mockup-skeleton-title"></div>
+           <div class="mockup-skeleton-row"></div>
+           <div class="mockup-skeleton-row"></div>
+           <div class="mockup-skeleton-row" style="width: 70%;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats" id="results">
+    <div class="stats-container">
+      <div class="stat-item reveal">
+        <div class="stat-value" data-target="99.9">0</div><span class="stat-suffix">%</span>
+        <div class="stat-label">Document Accuracy</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay: 0.1s;">
+        <div class="stat-value" data-target="85">0</div><span class="stat-suffix">%</span>
+        <div class="stat-label">Fraud Reduction</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay: 0.2s;">
+        <div class="stat-value" data-target="10">0</div><span class="stat-suffix">x</span>
+        <div class="stat-label">Faster Review Speed</div>
+      </div>
+      <div class="stat-item reveal" style="transition-delay: 0.3s;">
+        <div class="stat-value" data-target="12">0</div><span class="stat-suffix">M+</span>
+        <div class="stat-label">Alerts Handled</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid -->
+  <section class="features" id="features">
+    <div class="section-header reveal">
+      <h2>Uncompromising Security.</h2>
+      <p>Every tool you need to detect, monitor, and report fraudulent activities with absolute confidence.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card reveal">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h3>Document Integrity</h3>
+        <p>Verify forms, IDs, and statements instantly. We detect tampered pixels and metadata inconsistencies effortlessly.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay: 0.1s;">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        </div>
+        <h3>Cross-Document Mismatch</h3>
+        <p>Automatically correlate multiple applicant documents to identify hidden discrepancies across applications.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay: 0.2s;">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h3>Suspicious Activity</h3>
+        <p>Monitor risky employee or admin behaviors in real-time with an intelligent, adaptive alert matrix.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay: 0.3s;">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </div>
+        <h3>Status Transparency</h3>
+        <p>Give trusted customers real-time visibility into their application status without exposing internal checks.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay: 0.4s;">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h3>Audit-Ready Reports</h3>
+        <p>Generate comprehensive, immutable compliance reports for internal and external auditors.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay: 0.5s;">
+        <div class="icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <h3>Role-Based Access</h3>
+        <p>Strict RBAC ensures only authorized security personnel can access sensitive financial documents.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Split Reveal Section -->
+  <section class="split-section" id="security">
+    <div class="split-content reveal">
+      <div class="eyebrow">Intelligent Automation</div>
+      <h2>Reduce manual review time without sacrificing diligence.</h2>
+      <p>Our proprietary engine cross-checks applications against global risk databases, detecting synthetic identities and forged documents in milliseconds. Free your analysts to focus on what matters.</p>
+      <ul class="check-list">
+        <li>Real-time identity verification workflows</li>
+        <li>Automated metadata and OCR extraction</li>
+        <li>Continuous risk scoring and alerting</li>
+      </ul>
+    </div>
+    <div class="split-visual reveal" style="transition-delay: 0.2s;">
+      <div class="card-stack">
+        <div class="stacked-card card-3"></div>
+        <div class="stacked-card card-2"></div>
+        <div class="stacked-card card-1">
+          <div class="card-header">
+            <span>Scan Complete</span>
+            <span style="color: var(--text-secondary); font-size: 0.875rem;">Just now</span>
+          </div>
+          <div class="card-row"><span class="label">Risk Score</span> <span class="value success">Low (12)</span></div>
+          <div class="card-row"><span class="label">ID Match</span> <span class="value success">Verified</span></div>
+          <div class="card-row"><span class="label">Income Doc</span> <span class="value warning">Flagged - Tampered</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="section-header reveal">
+      <h2>Trusted by top financial institutions.</h2>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card reveal">
+        <p class="quote">"BankGuard360 transformed our underwriting process. We cut fraudulent approvals by 85% in the first quarter alone while saving time."</p>
+        <div class="author">
+          <div class="author-info">
+            <h4>Sarah Jenkins</h4>
+            <span>Chief Risk Officer, Meridian Bank</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="transition-delay: 0.1s;">
+        <p class="quote">"The cross-document mismatch detection is unparalleled. It catches subtleties our human reviewers used to miss entirely."</p>
+        <div class="author">
+          <div class="author-info">
+            <h4>David Chen</h4>
+            <span>VP of Compliance, Vault Financial</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="transition-delay: 0.2s;">
+        <p class="quote">"Audit-ready reports used to take days to compile. Now it’s one click. Absolute game changer for our security operations."</p>
+        <div class="author">
+          <div class="author-info">
+            <h4>Elena Rostova</h4>
+            <span>Lead Security Analyst, Nexus Credit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="cta-section reveal">
+    <div class="cta-glow"></div>
+    <div class="cta-content">
+      <h2>Ready to secure your institution?</h2>
+      <p>Deploy BankGuard360 today and stop fraud before it spreads through your ecosystem.</p>
+      <a href="#demo" class="btn btn-lg btn-primary">Book a Walkthrough</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="logo">BankGuard<span>360</span></div>
+        <p>Enterprise-grade document security, mismatch detection, and fraud prevention.</p>
+      </div>
+      <div class="footer-links">
+        <div class="link-group">
+          <h4>Product</h4>
+          <a href="#">Features</a>
+          <a href="#">Integrations</a>
+          <a href="#">Security</a>
+          <a href="#">Pricing</a>
+        </div>
+        <div class="link-group">
+          <h4>Company</h4>
+          <a href="#">About Us</a>
+          <a href="#">Careers</a>
+          <a href="#">Blog</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="link-group">
+          <h4>Legal</h4>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 BankGuard360. All rights reserved.</p>
+      <p>SOC2 Type II Certified</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Sticky Navbar Effect
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+
+      // 2. Reveal Animations
+      const revealElements = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+      revealElements.forEach(el => revealObserver.observe(el));
+
+      // 3. Counter Animation
+      const counters = document.querySelectorAll('.stat-value');
+      let hasAnimated = false;
+      
+      const animateCounters = () => {
+        counters.forEach(counter => {
+          const target = +counter.getAttribute('data-target');
+          const duration = 2000;
+          const increment = target / (duration / 16);
+          let current = 0;
+          
+          const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+              counter.innerText = target % 1 !== 0 ? current.toFixed(1) : Math.ceil(current);
+              requestAnimationFrame(updateCounter);
+            } else {
+              counter.innerText = target;
+            }
+          };
+          updateCounter();
+        });
+      };
+
+      const statsSection = document.getElementById('results');
+      if (statsSection) {
+        const statsObserver = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting && !hasAnimated) {
+            animateCounters();
+            hasAnimated = true;
+          }
+        }, { threshold: 0.5 });
+        statsObserver.observe(statsSection);
+      }
+
+      // 4. Feature Card Hover Glow Effect
+      const cards = document.querySelectorAll('.feature-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+      // 5. Hero Parallax Effect
+      const mockup = document.getElementById('mockup');
+      if (mockup) {
+        window.addEventListener('mousemove', (e) => {
+          const mouseX = e.clientX / window.innerWidth - 0.5;
+          const mouseY = e.clientY / window.innerHeight - 0.5;
+          mockup.style.transform = `rotateX(${8 - mouseY * 10}deg) rotateY(${mouseX * 10}deg) translateY(20px)`;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
